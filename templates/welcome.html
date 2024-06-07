@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Page</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        h1, h2, h3, ul, form {
+            text-align: center;
+            margin: 20px auto; /* Horizontal centering */
+        }
+        .file-list-container {
+            max-height: 200px; /* Set the maximum height of the container */
+            overflow-y: auto; /* Enable vertical scrolling */
+            border: 1px solid #ccc; /* Add a border for visual separation */
+            padding: 10px; /* Add some padding to the container */
+            margin-bottom: 20px; /* Add margin to separate from other elements */
+        }
+        .drop-zone {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+            width: 300px; /* Adjust the width as needed */
+            margin-left: auto; /* Horizontal centering */
+            margin-right: auto; /* Horizontal centering */
+        }
+
+        .link-list {
+            list-style-type: none; /* Remove bullet points */
+            padding: 0;
+            text-align: left; /* Align text to the left */
+        }
+
+        .link-list li {
+            color: black; /* Set text color to black */
+            font-size: medium; /* Set medium font size */
+            margin-bottom: 10px; /* Add space below each item */
+        }
+        .link-list li a {
+            text-decoration: none;
+        }
+
+        .view-button, .delete-button {
+            background-color: #007bff; /* Blue background color */
+            color: #ffffff; /* White text color */
+            padding: 5px 10px; /* Adjust padding */
+            font-size: 16px; /* Font size */
+            border: none; /* Remove border */
+            border-radius: 5px; /* Rounded corners */
+            cursor: pointer; /* Cursor style */
+            margin-right: 5px;
+        }
+
+        .view-button:hover, .delete-button:hover  {
+            background-color: #0056b3; /* Darker blue background color on hover */
+        }
+        form{
+            margin-top: auto;
+            margin-bottom: 100px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to Server</h1>
+    <h2>IP Address: {{ ip_address }}:8080</h2>
+    <!--<h3>All Files:</h3>
+    <div class="file-list-container">
+        <ul class="link-list">
+            {% for file in files %}
+            <li> 
+                    {{ loop.index }}. {{ file }}
+                    <a href="{{ url_for('download_file', filename=file) }}" download="{{ file }}"  class="view-button">View </a>
+                    <button onclick="deleteFile('{{ file }}')" class="delete-button">Delete</button>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>-->
+    <div>
+        <ul>
+            <li><a href="{{ url_for('welcome_images') }}">Images</a></li>
+            <li><a href="{{ url_for('welcome_music') }}">Music</a></li>
+            <li><a href="{{ url_for('welcome_videos') }}">Videos</a></li>
+        </ul>
+    </div>
+    
+    <!-- File upload input -->
+    <form id="upload-form" enctype="multipart/form-data">
+        <input type="file" id="file-input" name="file" style="display: none;" multiple>
+        <label for="file-input" class="drop-zone">Drag & Drop files here or click to browse</label>
+    </form>
+
+    <script>
+        // JavaScript to handle file upload
+        const fileInput = document.getElementById('file-input');
+
+        // Event listener for file input change
+        fileInput.addEventListener('change', () => {
+            const files = fileInput.files;
+            uploadFiles(files);
+        });
+
+        function uploadFiles(files) {
+            const formData = new FormData();
+            for (const file of files) {
+                formData.append('file', file);
+            }
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    location.reload(); // Reload the page to update the file list
+                }
+            })
+            .catch(error => console.error('Error uploading files:', error));
+        }
+
+        // Function to confirm file deletion
+        function deleteFile(filename) {
+            if (confirm('Are you sure you want to delete ' + filename + '?')) {
+                // If confirmed, send request to delete file
+                fetch('/delete_file', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        file_name: filename
+                    })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Reload the page to update the file list
+                        location.reload();
+                    } else {
+                        alert('Error deleting file');
+                    }
+                })
+                .catch(error => console.error('Error deleting file:', error));
+            }
+        }
+    </script>
+</body>
+</html>

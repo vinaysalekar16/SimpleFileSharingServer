@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Videos</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            margin-top: 20px auto;
+        }
+
+        h1, h2, h3, ul {
+            text-align: center;
+            margin: 20px auto; /* Horizontal centering */
+        }
+        .file-list-container {
+            max-height: 200px; /* Set the maximum height of the container */
+            overflow-y: auto; /* Enable vertical scrolling */
+            border: 1px solid #ccc; /* Add a border for visual separation */
+            padding: 10px; /* Add some padding to the container */
+            margin-bottom: 20px; /* Add margin to separate from other elements */
+        }
+
+        .link-list {
+            list-style-type: none; /* Remove bullet points */
+            padding: 0;
+            text-align: left; /* Align text to the left */
+        }
+
+        .link-list li {
+            color: black; /* Set text color to black */
+            font-size: medium; /* Set medium font size */
+            margin-bottom: 10px; /* Add space below each item */
+        }
+        .link-list li a {
+            text-decoration: none;
+        }
+
+        .button {
+            background-color: #007bff; /* Blue background color */
+            color: #ffffff; /* White text color */
+            padding: 5px 10px; /* Adjust padding */
+            font-size: 16px; /* Font size */
+            border: none; /* Remove border */
+            border-radius: 5px; /* Rounded corners */
+            cursor: pointer; /* Cursor style */
+            margin-right: 5px;
+        }
+
+        .button:hover  {
+            background-color: #0056b3; /* Darker blue background color on hover */
+        }
+    </style>
+</head>
+<body>
+    <div class="file-list-container">
+        <h1>Videos</h1>
+        <ul class="link-list">
+            {% for file in videos_files %}
+                <li>
+                    <a>{{ file }}</a>
+                    <a href="{{ url_for('stream_video', filename=file) }}" class="button">Play</a>
+                    <a href="{{ url_for('stream_video', filename=file) }}" download="{{ file }}"  class="button">Download</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>

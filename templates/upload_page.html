@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .drop-zone {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+            width: 300px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .success-message, .error-message {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>File Upload</h1>
+
+        <!-- File upload input -->
+        <form id="upload-form" enctype="multipart/form-data">
+            <input type="file" id="file-input" name="file" style="display: none;" multiple>
+            <label for="file-input" class="drop-zone">Drag & Drop files here or click to browse</label>
+        </form>
+    </div>
+
+    <script>
+        // JavaScript to handle file upload
+        const fileInput = document.getElementById('file-input');
+
+        // Event listener for file input change
+        fileInput.addEventListener('change', () => {
+            const files = fileInput.files;
+            uploadFiles(files);
+        });
+
+        function uploadFiles(files) {
+            const formData = new FormData();
+            for (const file of files) {
+                formData.append('file', file);
+            }
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(message => {
+                if (message.includes('successfully')) {
+                    showSuccessMessage(message);
+                } else {
+                    showErrorMessage(message);
+                }
+                window.location.href = '{{ url_for("admin_dashboard") }}'; // Redirect to the admin dashboard
+            })
+            .catch(error => {
+                showErrorMessage('Error uploading files: ' + error);
+                console.error('Error uploading files:', error);
+            });
+        }
+
+        function showSuccessMessage(message) {
+            const successMessage = document.createElement('div');
+            successMessage.classList.add('success-message');
+            successMessage.textContent = message;
+            document.body.appendChild(successMessage);
+            setTimeout(() => successMessage.remove(), 3000);
+        }
+
+        function showErrorMessage(message) {
+            const errorMessage = document.createElement('div');
+            errorMessage.classList.add('error-message');
+            errorMessage.textContent = message;
+            document.body.appendChild(errorMessage);
+            setTimeout(() => errorMessage.remove(), 3000);
+        }
+    </script>
+</body>
+</html>
